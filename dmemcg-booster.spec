@@ -1,34 +1,42 @@
 Name:           dmemcg-booster
 Version:        0.1.2
 Release:        1%{?dist}
-Summary:        Dynamic memory cgroup booster for KDE Plasma
+Summary:        Service for enabling and controlling VRAM protection limits via dmem cgroups
 
-License:        GPLv3+
+License:        MIT
 URL:            https://gitlab.steamos.cloud/holo/dmemcg-booster
-Source0:        %{url}/-/archive/v%{version}/dmemcg-booster-v%{version}.tar.gz
+Source0:        %{url}/-/archive/${version}/dmemcg-booster-${version}.tar.gz
 
-BuildRequires:  cmake
-BuildRequires:  gcc-c++
+BuildRequires:  cargo
+BuildRequires:  libdrm-devel
 BuildRequires:  systemd-rpm-macros
-# List the Qt and KDE Frameworks devel packages here:
-BuildRequires:  qt6-qtbase-devel
-BuildRequires:  kf6-kcoreaddons-devel
 
 %description
-A background service that dynamically manages memory cgroups to boost foreground gaming performance by evicting background application VRAM.
+A systemd service used for enabling and controlling DMEM cgroup limits for 
+boosting foreground games. This activates the kernel's VRAM protection logic, 
+ensuring that foreground applications (games) have first priority on VRAM and 
+that background processes are evicted first during VRAM pressure.
 
 %prep
-%autosetup -p1
+# GitLab packs the root folder as 'dmemcg-booster-main' because it targets the main branch
+%autosetup -n dmemcg-booster-main -p1
 
 %build
-# The %cmake macro handles build directory creation and configuration
-%cmake 
-%cmake_build
+cargo build --release
 
 %install
-%cmake_install
+# Create target system paths inside the clean buildroot environment
+install -d %{buildroot}%{_bindir}
+install -d %{buildroot}%{_unitdir}
+install -d %{buildroot}%{_userunitdir}
 
-# These macros safely handle enabling and starting the services during installation
+# Copy the compiled Rust binary into the system binary path
+install -m 0755 target/release/dmemcg-booster %{buildroot}%{_bindir}/dmemcg-booster
+
+# Copy the systemd configuration files included in the source code
+install -m 0644 dmemcg-booster-system.service %{buildroot}%{_unitdir}/dmemcg-booster-system.service
+install -m 0644 dmemcg-booster-user.service %{buildroot}%{_userunitdir}/dmemcg-booster-user.service
+
 %post
 %systemd_post dmemcg-booster-system.service
 %systemd_user_post dmemcg-booster-user.service
@@ -43,7 +51,6 @@ A background service that dynamically manages memory cgroups to boost foreground
 
 %files
 %license LICENSE
-%doc README.md
 %{_bindir}/dmemcg-booster
 %{_unitdir}/dmemcg-booster-system.service
 %{_userunitdir}/dmemcg-booster-user.service
