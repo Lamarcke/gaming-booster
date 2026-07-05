@@ -10,6 +10,8 @@ Source0:        %{url}/-/archive/%{version}/dmemcg-booster-%{version}.tar.gz
 BuildRequires:  cargo
 BuildRequires:  libdrm-devel
 BuildRequires:  systemd-rpm-macros
+BuildRequires:  dbus-devel
+BuildRequires:  pkgconfig
 
 %description
 A systemd service used for enabling and controlling DMEM cgroup limits for 
