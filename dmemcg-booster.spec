@@ -5,7 +5,7 @@ Summary:        Service for enabling and controlling VRAM protection limits via 
 
 License:        MIT
 URL:            https://gitlab.steamos.cloud/holo/dmemcg-booster
-Source0:        %{url}/-/archive/${version}/dmemcg-booster-${version}.tar.gz
+Source0:        %{url}/-/archive/%{version}/dmemcg-booster-%{version}.tar.gz
 
 BuildRequires:  cargo
 BuildRequires:  libdrm-devel
@@ -18,8 +18,7 @@ ensuring that foreground applications (games) have first priority on VRAM and
 that background processes are evicted first during VRAM pressure.
 
 %prep
-# GitLab packs the root folder as 'dmemcg-booster-main' because it targets the main branch
-%autosetup -n dmemcg-booster-main -p1
+%autosetup -n dmemcg-booster-%{version} -p1
 
 %build
 cargo build --release
