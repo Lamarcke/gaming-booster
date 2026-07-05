@@ -51,7 +51,6 @@ install -m 0644 dmemcg-booster-user.service %{buildroot}%{_userunitdir}/dmemcg-b
 %systemd_user_postun_with_restart dmemcg-booster-user.service
 
 %files
-%license LICENSE
 %{_bindir}/dmemcg-booster
 %{_unitdir}/dmemcg-booster-system.service
 %{_userunitdir}/dmemcg-booster-user.service
